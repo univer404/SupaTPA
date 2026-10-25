@@ -171,10 +171,10 @@ public final class SupaTPA extends JavaPlugin implements Listener, TabExecutor {
         Inventory inventory = Bukkit.createInventory(holder, size, title);
         holder.inventory = inventory;
         fill(inventory);
-        String section = "gui." + type.name().toLowerCase(Locale.ROOT) + ".";
+        String section = type.name().toLowerCase(Locale.ROOT) + ".";
         setButton(inventory, guiConfig.getInt(section + "cancel-slot", 10), guiConfig.getString(section + "cancel-material", "RED_STAINED_GLASS_PANE"), color(guiConfig.getString(section + "cancel-name", "&cCancel")), List.of(color("&7Close this menu")));
         setButton(inventory, guiConfig.getInt(section + "player-slot", 13), "PLAYER_HEAD", color("&a" + other.getName()), List.of(color("&7Teleport request target")));
-        setButton(inventory, guiConfig.getInt(section + "location-slot", 12), worldMaterial(other.getWorld()), color("&aLocation"), List.of(color("&7World: " + other.getWorld().getName())));
+        setButton(inventory, guiConfig.getInt(section + "location-slot", 12), worldMaterial(other.getWorld()).name(), color("&aLocation"), List.of(color("&7World: " + other.getWorld().getName())));
         setButton(inventory, guiConfig.getInt(section + "confirm-slot", 16), guiConfig.getString(section + "confirm-material", "LIME_STAINED_GLASS_PANE"), color(guiConfig.getString(section + "confirm-name", type == MenuType.ACCEPT ? "&aAccept" : "&aConfirm")), List.of(color(type == MenuType.ACCEPT ? "&7Accept this request" : "&7Send teleport request")));
         viewer.openInventory(inventory);
     }
