@@ -21,6 +21,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -34,6 +36,8 @@ public final class SupaTPA extends JavaPlugin implements Listener, TabExecutor {
     private final Map<UUID, BukkitTask> teleportTasks = new ConcurrentHashMap<>();
     private final Set<UUID> tpaDisabled = ConcurrentHashMap.newKeySet();
     private final Set<UUID> tpaHereDisabled = ConcurrentHashMap.newKeySet();
+    private FileConfiguration messagesConfig;
+    private FileConfiguration guiConfig;
 
     private enum RequestType { TO, HERE }
     private record TeleportRequest(UUID sender, UUID recipient, RequestType type, long expiresAt) {}
@@ -45,6 +49,8 @@ public final class SupaTPA extends JavaPlugin implements Listener, TabExecutor {
         saveDefaultConfig();
         saveResourceIfMissing("messages.yml");
         saveResourceIfMissing("gui.yml");
+        messagesConfig = YamlConfiguration.loadConfiguration(new java.io.File(getDataFolder(), "messages.yml"));
+        guiConfig = YamlConfiguration.loadConfiguration(new java.io.File(getDataFolder(), "gui.yml"));
         for (String name : List.of("tpa", "tpahere", "tpaccept", "tpacancel", "tpatoggle", "tpaheretoggle")) {
             PluginCommand command = getCommand(name);
             if (command != null) { command.setExecutor(this); command.setTabCompleter(this); }
@@ -66,7 +72,7 @@ public final class SupaTPA extends JavaPlugin implements Listener, TabExecutor {
     }
 
     private String message(String key) {
-        return color(getConfig().getString("messages." + key, key));
+        return color(messagesConfig.getString(key, key));
     }
 
     private String color(String text) {
@@ -159,23 +165,23 @@ public final class SupaTPA extends JavaPlugin implements Listener, TabExecutor {
 
     private void openConfirmation(Player viewer, Player other, MenuType type) {
         String path = "menus." + type.name().toLowerCase(Locale.ROOT);
-        String title = color(getConfig().getString("gui." + type.name().toLowerCase(Locale.ROOT) + ".title", type == MenuType.ACCEPT ? "&8Accept Request" : "&8Confirm Request"));
-        int size = Math.max(9, Math.min(54, getConfig().getInt("gui." + type.name().toLowerCase(Locale.ROOT) + ".rows", 3) * 9));
+        String title = color(guiConfig.getString(type.name().toLowerCase(Locale.ROOT) + ".title", type == MenuType.ACCEPT ? "&8Accept Request" : "&8Confirm Request"));
+        int size = Math.max(9, Math.min(54, guiConfig.getInt(type.name().toLowerCase(Locale.ROOT) + ".rows", 3) * 9));
         MenuHolder holder = new MenuHolder(type, other.getUniqueId());
         Inventory inventory = Bukkit.createInventory(holder, size, title);
         holder.inventory = inventory;
         fill(inventory);
         String section = "gui." + type.name().toLowerCase(Locale.ROOT) + ".";
-        setButton(inventory, getConfig().getInt(section + "cancel-slot", 10), getConfig().getString(section + "cancel-material", "RED_STAINED_GLASS_PANE"), color(getConfig().getString(section + "cancel-name", "&cCancel")), List.of(color("&7Close this menu")));
-        setButton(inventory, getConfig().getInt(section + "player-slot", 13), "PLAYER_HEAD", color("&a" + other.getName()), List.of(color("&7Teleport request target")));
-        setButton(inventory, getConfig().getInt(section + "location-slot", 12), worldMaterial(other.getWorld()), color("&aLocation"), List.of(color("&7World: " + other.getWorld().getName())));
-        setButton(inventory, getConfig().getInt(section + "confirm-slot", 16), getConfig().getString(section + "confirm-material", "LIME_STAINED_GLASS_PANE"), color(getConfig().getString(section + "confirm-name", type == MenuType.ACCEPT ? "&aAccept" : "&aConfirm")), List.of(color(type == MenuType.ACCEPT ? "&7Accept this request" : "&7Send teleport request")));
+        setButton(inventory, guiConfig.getInt(section + "cancel-slot", 10), guiConfig.getString(section + "cancel-material", "RED_STAINED_GLASS_PANE"), color(guiConfig.getString(section + "cancel-name", "&cCancel")), List.of(color("&7Close this menu")));
+        setButton(inventory, guiConfig.getInt(section + "player-slot", 13), "PLAYER_HEAD", color("&a" + other.getName()), List.of(color("&7Teleport request target")));
+        setButton(inventory, guiConfig.getInt(section + "location-slot", 12), worldMaterial(other.getWorld()), color("&aLocation"), List.of(color("&7World: " + other.getWorld().getName())));
+        setButton(inventory, guiConfig.getInt(section + "confirm-slot", 16), guiConfig.getString(section + "confirm-material", "LIME_STAINED_GLASS_PANE"), color(guiConfig.getString(section + "confirm-name", type == MenuType.ACCEPT ? "&aAccept" : "&aConfirm")), List.of(color(type == MenuType.ACCEPT ? "&7Accept this request" : "&7Send teleport request")));
         viewer.openInventory(inventory);
     }
 
     private void fill(Inventory inventory) {
-        if (!getConfig().getBoolean("gui.fill-empty-slots", true)) return;
-        Material material = Material.matchMaterial(getConfig().getString("gui.filler-material", "BLACK_STAINED_GLASS_PANE"));
+        if (!guiConfig.getBoolean("fill-empty-slots", true)) return;
+        Material material = Material.matchMaterial(guiConfig.getString("filler-material", "BLACK_STAINED_GLASS_PANE"));
         if (material == null || !material.isItem()) material = Material.BLACK_STAINED_GLASS_PANE;
         ItemStack filler = new ItemStack(material);
         ItemMeta meta = filler.getItemMeta();
@@ -211,7 +217,7 @@ public final class SupaTPA extends JavaPlugin implements Listener, TabExecutor {
         if (!(event.getView().getTopInventory().getHolder() instanceof MenuHolder holder)) return;
         event.setCancelled(true);
         if (event.getClickedInventory() != event.getView().getTopInventory()) return;
-        String section = "gui." + holder.type.name().toLowerCase(Locale.ROOT) + ".";
+        String section = holder.type.name().toLowerCase(Locale.ROOT) + ".";
         int slot = event.getRawSlot();
         if (slot == getConfig().getInt(section + "cancel-slot", 10)) {
             player.closeInventory();
