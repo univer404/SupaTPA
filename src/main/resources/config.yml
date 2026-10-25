@@ -1,0 +1,6 @@
+# Time before a teleport request can be sent again to the same player.
+request-cooldown-seconds: 60
+
+# Delay before teleporting after a request is accepted.
+# Moving more than 0.5 blocks cancels the teleport.
+teleport-delay-seconds: 5
