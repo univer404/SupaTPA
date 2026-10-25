@@ -1,0 +1,40 @@
+# Standard Bukkit inventory menus are compatible with Java and Geyser/Floodgate Bedrock players.
+# Slot numbers start at 0. Use straight text for maximum client compatibility.
+fill-empty-slots: true
+filler-material: BLACK_STAINED_GLASS_PANE
+
+send_to:
+  title: "&8Confirm TPA Request"
+  rows: 3
+  cancel-slot: 10
+  location-slot: 12
+  player-slot: 13
+  confirm-slot: 16
+  cancel-material: RED_STAINED_GLASS_PANE
+  cancel-name: "&cCancel"
+  confirm-material: LIME_STAINED_GLASS_PANE
+  confirm-name: "&aConfirm"
+
+send_here:
+  title: "&8Confirm TPA-HERE Request"
+  rows: 3
+  cancel-slot: 10
+  location-slot: 12
+  player-slot: 13
+  confirm-slot: 16
+  cancel-material: RED_STAINED_GLASS_PANE
+  cancel-name: "&cCancel"
+  confirm-material: LIME_STAINED_GLASS_PANE
+  confirm-name: "&aConfirm"
+
+accept:
+  title: "&8Accept Teleport Request"
+  rows: 3
+  cancel-slot: 10
+  location-slot: 12
+  player-slot: 13
+  confirm-slot: 16
+  cancel-material: RED_STAINED_GLASS_PANE
+  cancel-name: "&cCancel"
+  confirm-material: LIME_STAINED_GLASS_PANE
+  confirm-name: "&aAccept"
