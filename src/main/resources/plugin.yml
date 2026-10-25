@@ -1,0 +1,27 @@
+name: SupaTPA
+version: 1.0.0
+main: com.supatpa.SupaTPA
+api-version: '1.21'
+author: univer404
+description: Configurable teleport requests with confirmation menus and movement cancellation.
+commands:
+  tpa:
+    description: Request to teleport to another player.
+    usage: /tpa <player>
+  tpahere:
+    description: Request another player to teleport to you.
+    usage: /tpahere <player>
+  tpaccept:
+    description: Accept a teleport request.
+    usage: /tpaccept [player]
+  tpacancel:
+    description: Deny a teleport request.
+    usage: /tpacancel <player>
+  tpatoggle:
+    description: Toggle incoming teleport-to-you requests.
+  tpaheretoggle:
+    description: Toggle incoming teleport-here requests.
+permissions:
+  supatpa.use:
+    description: Use SupaTPA commands.
+    default: true
